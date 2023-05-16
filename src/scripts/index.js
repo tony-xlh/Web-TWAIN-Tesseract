@@ -56,6 +56,10 @@ function registerEvents() {
   document.getElementsByClassName("batch-ocr-btn")[0].addEventListener("click",function(){
     BatchOCR();
   });
+
+  document.getElementsByClassName("download-text-btn")[0].addEventListener("click",function(){
+    DownloadText();
+  });
 }
 
 function showTextOfPage(ImageID){
@@ -154,4 +158,26 @@ async function OCROneImage(index){
       reject("Not initialized");
     }
   });
+}
+
+function DownloadText(){
+  if (DWObject) {
+    let text = "";
+    for (let index = 0; index < DWObject.HowManyImagesInBuffer; index++) {
+      const ImageID = DWObject.IndexToImageID(index);
+      if (resultsDict[ImageID]) {
+        text = text + resultsDict[ImageID].data.text;
+      }
+      text = text + "\n\n=== "+ "Page "+ (index+1) +" ===\n\n";
+    }
+    let filename = 'text.txt';
+    let link = document.createElement('a');
+    link.style.display = 'none';
+    link.setAttribute('target', '_blank');
+    link.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
 }
