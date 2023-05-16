@@ -4,6 +4,7 @@ import { createWorker } from 'tesseract.js';
 
 let DWObject;
 let worker;
+let resultsDict = {};
 
 window.onload = function(){
   initDWT();
@@ -40,7 +41,14 @@ function registerEvents() {
     }
   });
 
-  
+
+  document.getElementsByClassName("ocr-btn")[0].addEventListener("click",function(){
+    OCRSelected();
+  });
+
+  document.getElementsByClassName("batch-ocr-btn")[0].addEventListener("click",function(){
+    BatchOCR();
+  });
 }
 
 function initDWT(){
@@ -71,4 +79,60 @@ async function initTesseract(){
   status.innerText = "Initializing...";
   await worker.initialize('eng');
   status.innerText = "Ready";
+}
+
+async function OCRSelected(){
+  if (DWObject && worker) {
+    const index = DWObject.CurrentImageIndexInBuffer;
+    const skipProcessed = document.getElementById("skip-processed-chk").checked;
+    const ImageID = DWObject.IndexToImageID(index);
+    if (skipProcessed) {
+      if (resultsDict[ImageID]) {
+        console.log("Processed");
+        return;
+      }
+    }
+    const status = document.getElementById("status");
+    status.innerText = "Recognizing...";
+    const data = await OCROneImage(index);
+    resultsDict[ImageID] = data;
+    status.innerText = "Done";
+  }
+}
+
+async function BatchOCR(){
+  if (DWObject && worker) {
+    const skipProcessed = document.getElementById("skip-processed-chk").checked;
+    const status = document.getElementById("status");
+    for (let index = 0; index < DWObject.HowManyImagesInBuffer; index++) {
+      const ImageID = DWObject.IndexToImageID(index);
+      if (skipProcessed) {
+        if (resultsDict[ImageID]) {
+          console.log("Processed");
+          continue;
+        }
+      }
+      status.innerText = "Recognizing page "+(index+1)+"...";
+      const data = await OCROneImage(DWObject.CurrentImageIndexInBuffer);
+      resultsDict[ImageID] = data;
+    }
+    status.innerText = "Done";
+  }
+}
+
+async function OCROneImage(index){
+  return new Promise(function (resolve, reject) {
+    if (DWObject) {
+      const success = async (result) => {
+        const data = await worker.recognize(result);
+        resolve(data);
+      };
+      const failure = (errorCode, errorString) => {
+        reject(errorString);
+      };
+      DWObject.ConvertToBlob([index],Dynamsoft.DWT.EnumDWT_ImageType.IT_JPG, success, failure);
+    }else{
+      reject("Not initialized");
+    }
+  });
 }
