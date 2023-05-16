@@ -10,10 +10,26 @@
       width: 320px;
       height: 400px;
     }
+    .app {
+      display: flex;
+    }
+
+    .ocr {
+      margin-left: 2em;
+    }
   </style>
 </head>
 <body>
   <h2>Web TWAIN + Tesseract OCR Demo</h2>
-  <div id="dwtcontrolcontainer"></div>
+  <div class="app">
+    <div class="document-scanner">
+      <button>Scan</button>
+      <button>Load Files</button>
+      <div id="dwtcontrolcontainer"></div>
+    </div>
+    <div class="ocr">
+      Tesseract 
+    </div>
+  </div>
 </body>
 </html>
