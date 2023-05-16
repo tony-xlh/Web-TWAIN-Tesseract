@@ -12,6 +12,14 @@ window.onload = function(){
 };
 
 function registerEvents() {
+  DWObject.RegisterEvent('OnBufferChanged',function (bufferChangeInfo) {
+    const selectedIds = bufferChangeInfo["selectedIds"];
+    console.log(bufferChangeInfo);
+    if (selectedIds.length === 1) {
+      showTextOfPage(selectedIds[0]);
+    }
+  });
+
   document.getElementsByClassName("scan-btn")[0].addEventListener("click",function(){
     if (DWObject) {
       DWObject.SelectSource(function () {
@@ -41,7 +49,6 @@ function registerEvents() {
     }
   });
 
-
   document.getElementsByClassName("ocr-btn")[0].addEventListener("click",function(){
     OCRSelected();
   });
@@ -49,6 +56,17 @@ function registerEvents() {
   document.getElementsByClassName("batch-ocr-btn")[0].addEventListener("click",function(){
     BatchOCR();
   });
+}
+
+function showTextOfPage(ImageID){
+  console.log(ImageID);
+  if (resultsDict[ImageID]) {
+    console.log(resultsDict);
+    const text = resultsDict[ImageID].data.text;
+    document.getElementsByClassName("text")[0].innerText = text;
+  }else{
+    document.getElementsByClassName("text")[0].innerText = "";
+  }
 }
 
 function initDWT(){
@@ -97,6 +115,7 @@ async function OCRSelected(){
     const data = await OCROneImage(index);
     resultsDict[ImageID] = data;
     status.innerText = "Done";
+    showTextOfPage(ImageID);
   }
 }
 
@@ -113,7 +132,7 @@ async function BatchOCR(){
         }
       }
       status.innerText = "Recognizing page "+(index+1)+"...";
-      const data = await OCROneImage(DWObject.CurrentImageIndexInBuffer);
+      const data = await OCROneImage(index);
       resultsDict[ImageID] = data;
     }
     status.innerText = "Done";
