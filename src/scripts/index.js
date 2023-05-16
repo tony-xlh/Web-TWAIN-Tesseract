@@ -29,6 +29,15 @@ function registerEvents() {
       DWObject.LoadImageEx("", Dynamsoft.DWT.EnumDWT_ImageType.IT_ALL);
     }
   });
+
+  document.getElementsByClassName("edit-btn")[0].addEventListener("click",function(){
+    if (DWObject) {
+      let imageEditor = DWObject.Viewer.createImageEditor();
+      imageEditor.show();
+    }
+  });
+
+  
 }
 
 function initDWT(){
