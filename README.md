@@ -1,6 +1,10 @@
-# Webpack Frontend Starterkit
+# Web-TWAIN-Tesseract
 
-A lightweight foundation for your next webpack based frontend project.
+A demo of using Tesseract.js to extract text of documents scanned with [Dynamic Web TWAIN](https://www.dynamsoft.com/web-twain/overview/).
+
+[Online demo](https://startling-conkies-477ef8.netlify.app/)
+
+If the SDK expires, you need to apply for your license [here](https://www.dynamsoft.com/customer/license/trialLicense?product=dwt).
 
 ### Installation
 
