@@ -1,10 +1,13 @@
 import '../styles/index.scss';
 import Dynamsoft from "dwt";
+import { createWorker } from 'tesseract.js';
 
 let DWObject;
+let worker;
 
 window.onload = function(){
   initDWT();
+  initTesseract();
 };
 
 function registerEvents() {
@@ -55,4 +58,17 @@ function initDWT(){
       ContainerId: containerID
   }];
   Dynamsoft.DWT.Load();
+}
+
+async function initTesseract(){
+  const status = document.getElementById("status");
+  status.innerText = "Loading tesseract core...";
+  worker = await createWorker({
+    logger: m => console.log(m)
+  });
+  status.innerText = "Loading lanuage model...";
+  await worker.loadLanguage('eng');
+  status.innerText = "Initializing...";
+  await worker.initialize('eng');
+  status.innerText = "Ready";
 }
